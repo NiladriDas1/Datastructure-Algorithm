@@ -1,14 +1,18 @@
 #ifndef DATASTRUCTURE_H
 #define DATASTRUCTURE_H
 
+
 typedef struct Array{
-    void *Data;
-    unsigned int U_Maxsize ;
-    unsigned int L_Maxsize ;
+    struct Mainarray{
+        void *Data;
+        unsigned int U_Maxsize ;
+        unsigned int L_Maxsize ;
+    }*Mainarray;
     //Cout the current stage
     unsigned int counterPos;
-    struct Array *(*Method)();
-    struct Array *Point_matrix;
+    //Cout the Funciton call
+    struct Array *(*Method)(struct Array *Array, unsigned int size, unsigned int Maxsize);
+    struct Array *Point_matrix;//Parallel array likend list array ;
 
 
 }Array;
