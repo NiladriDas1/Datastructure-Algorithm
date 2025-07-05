@@ -10,6 +10,14 @@
         #include <stdarg.h>
         #include <string.h>
     #endif
+    
+    
+    
+typedef enum MoDE { PRINT = 3, GET_MEMORY = 1, DEFINE_VARIANT = 2 } mode;
+// Mode enum defines the operation modes:
+// - PRINT: For printing values.
+// - GET_MEMORY: For allocating memory for arrays.
+// - DEFINE_VARIANT: For defining a variant type that can hold different data types.
 
 // Memory tracking
 static size_t total_alloc = 0;
@@ -36,7 +44,7 @@ typedef struct {
     Data value;
 } Variant;
 
-typedef enum MoDE { PRINT = 3, GET_MEMORY = 1, DEFINE_VARIANT = 2 } mode;
+
 
 // Making all prototype functions
 void* tyecasting_int(mode m, int vcount, ...);
