@@ -30,4 +30,6 @@
     typedef struct Type_Oftensor{const unsigned int Low,High,Right,Left;}Typetensor;
     typedef enum ComputerOperation{XOR,AND,NOR,OR,NOT,NAND}CsOpcode;
     enum ArrayisNull{NotEmpty,Empty};
+    typedef enum ItrateLocation{MID,END,START,PRIVIOUS,NEXT}ITRLOC;
+    
 #endif

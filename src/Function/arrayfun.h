@@ -20,6 +20,7 @@ void ArrayInfo(ARR *ptr);
 void FreearrayandLoc(ARR *ptr, unsigned int Len);
 void OnlyFreeArrayVardata(ARR *ptr, unsigned int Len);
 void OnlyFreeLoc(ARR *ptr, unsigned int Len);
+void SpecificFreeLoc(ARR *ptr);
 
 void SwapIndicesAndUpdateLoc(ARR *ptr, unsigned int Len, unsigned int i, unsigned int j);
 void Swap_EndToMid(ARR *ptr, unsigned int Len);
@@ -58,21 +59,15 @@ void ARR_Deduplicate(ARR *arr, unsigned int Len);
 
 
 /*Complete these Loc code*/
-void ItrateThroughLoc(ARR *LOCARR);
-void DeleteThroughLoc(ARR *LOCARR);
-void UpdateThroughLoc(ARR *LOCARR);
-void ReplaceThroughLoc(ARR *LOCARR);
-void InfoThroughLoc(ARR *LOCARR);
-void SwapThroughLoc(ARR *LOCARR,ARR *LOCARR2);
-void SetNewLocThroughLoc(ARR *LOCARR);
-void FreethorughLoc(ARR *loc);
-
-
-
-
-
-
-
+static ARR* get_loc_node(ARR *base, ITRLOC loc);
+void ItrateThroughLoc(ARR *LOCARR,ITRLOC ITloc);
+void DeleteThroughLoc(ARR *LOCARR,ITRLOC ITloc);
+void UpdateThroughLoc(ARR *LOCARR,ITRLOC ITloc);
+void ReplaceThroughLoc(ARR *LOCARR,ITRLOC ITloc);
+void InfoThroughLoc(ARR *LOCARR,ITRLOC ITloc);
+void SwapThroughLoc(ARR *LOCARR,ARR *LOCARR2,ITRLOC ITloc1,ITRLOC ITloc2);
+void SetNewLocThroughLoc(ARR *LOCARR,ITRLOC ITloc);
+void FreethorughLoc(ARR *loc,ITRLOC ITloc);
 
 
 
@@ -160,6 +155,17 @@ void OnlyFreeLoc(ARR *ptr,unsigned int Len){
     }
 
     }
+void SpecificFreeLoc(ARR *ptr){
+    if (ARRAYISNULL(ptr) == Empty)
+        return;
+        ptr->Loc.Privious = NULL;
+            ptr->Loc.Next     = NULL;
+            ptr->Loc.Mid      = NULL;
+            ptr->Loc.end      = NULL;
+            ptr->Loc.start    = NULL;
+    
+
+}    
 
 void SwapIndicesAndUpdateLoc(ARR *ptr, unsigned int Len, unsigned int i, unsigned int j) {
     if (!ptr || i >= Len || j >= Len || i == j ||ARRAYISNULL(ptr)) return;
@@ -509,6 +515,186 @@ void ArrayInfo(ARR *ptr) {
 }
 
 
+// Returns the node corresponding to type in ITRLOC enum, or NULL if not available.
+static ARR* get_loc_node(ARR *base, ITRLOC loc) {
+    if (!base) return NULL;
+    switch (loc) {
+        case MID:      return base->Loc.Mid;
+        case END:      return base->Loc.end;
+        case START:    return base->Loc.start;
+        case PRIVIOUS: return base->Loc.Privious;
+        case NEXT:     return base->Loc.Next;
+        default:       return NULL;
+    }
+}
 
 
+void ItrateThroughLoc(ARR *LOCARR, ITRLOC ITloc) {
+    if (!LOCARR) return;
 
+    ARR *cur = NULL;
+    if (ITloc == START || ITloc == END || ITloc == MID ||
+        ITloc == PRIVIOUS || ITloc == NEXT)
+        cur = get_loc_node(LOCARR, ITloc);
+
+    // If not found, fallback to LOCARR itself
+    if (!cur) cur = LOCARR;
+
+    // Decide iteration direction: forward, backward, or single node
+    switch (ITloc) {
+        case START:
+             while (cur) {
+                Variant_print(cur->var_Data);
+                printf("pos: %u\n", cur->pos);
+                printf("%u->",cur->Loc.start);
+                
+                cur = cur->Loc.start;
+            }
+            break;
+        case NEXT:
+         while (cur) {
+                Variant_print(cur->var_Data);
+                printf("pos: %u\n", cur->pos);
+                printf("%u",cur->Loc.Next);
+                
+                cur = cur->Loc.Next;
+            }
+            break;
+        case MID:
+            // Forward iteration
+            while (cur) {
+                Variant_print(cur->var_Data);
+                printf("pos: %u\n", cur->pos);
+                printf("%u",cur->Loc.Mid);
+                
+                cur = cur->Loc.Mid;
+            }
+            break;
+        case END:
+             while (cur) {
+                Variant_print(cur->var_Data);
+                printf("pos: %u\n", cur->pos);
+                printf("%u",cur->Loc.end);
+                
+                cur = cur->Loc.end;
+            }
+            break;
+        case PRIVIOUS:
+            // Backward iteration
+            while (cur) {
+                printf("pos: %u\n", cur->pos);
+                cur = cur->Loc.Privious;
+            }
+            break;
+        default:
+            // Single node
+            printf("pos: %u\n", cur->pos);
+            break;
+    }
+}
+
+
+void DeleteThroughLoc(ARR *LOCARR, ITRLOC ITloc) {
+    if (!LOCARR) return;
+    ARR *Temp = get_loc_node(LOCARR, ITloc);
+    if (!Temp) Temp = LOCARR;
+
+    switch (ITloc)
+    {
+        case MID: {
+            // Only free the internal var_Data of the MID node
+            if (Temp->var_Data) {
+                Free_Variant(Temp->var_Data);
+                Temp->var_Data = NULL;
+            }
+            // Optionally clear other fields if desired
+            break;
+        }
+
+        case END: {
+            // Unlink the END node from the chain
+            if (Temp->Loc.Privious)
+                Temp->Loc.Privious->Loc.Next = NULL;
+            if (Temp->var_Data) {
+                Free_Variant(Temp->var_Data);
+                Temp->var_Data = NULL;
+            }
+            Temp->Loc.Privious = NULL;
+            Temp->Loc.Next = NULL;
+            Temp->Loc.Mid = NULL;
+            Temp->Loc.start = NULL;
+            Temp->Loc.end = NULL;
+            free(Temp);
+            break;
+        }
+
+        case START: {
+            // Unlink the START node from the chain
+            if (Temp->Loc.Next)
+                Temp->Loc.Next->Loc.Privious = NULL;
+            if (Temp->var_Data) {
+                Free_Variant(Temp->var_Data);
+                Temp->var_Data = NULL;
+            }
+            Temp->Loc.Privious = NULL;
+            Temp->Loc.Next = NULL;
+            Temp->Loc.Mid = NULL;
+            Temp->Loc.start = NULL;
+            Temp->Loc.end = NULL;
+            free(Temp);
+            break;
+        }
+
+        case PRIVIOUS: {
+            // Unlink the previous node of LOCARR (if it exists)
+            ARR *prev = Temp->Loc.Privious;
+            if (prev) {
+                if (prev->Loc.Privious)
+                    prev->Loc.Privious->Loc.Next = prev->Loc.Next;
+                if (prev->Loc.Next)
+                    prev->Loc.Next->Loc.Privious = prev->Loc.Privious;
+                if (prev->var_Data) {
+                    Free_Variant(prev->var_Data);
+                    prev->var_Data = NULL;
+                }
+                prev->Loc.Privious = NULL;
+                prev->Loc.Next = NULL;
+                prev->Loc.Mid = NULL;
+                prev->Loc.start = NULL;
+                prev->Loc.end = NULL;
+                free(prev);
+            }
+            break;
+        }
+
+        case NEXT: {
+            // Unlink the next node of LOCARR (if it exists)
+            ARR *next = Temp->Loc.Next;
+            if (next) {
+                if (next->Loc.Next)
+                    next->Loc.Next->Loc.Privious = next->Loc.Privious;
+                if (next->Loc.Privious)
+                    next->Loc.Privious->Loc.Next = next->Loc.Next;
+                if (next->var_Data) {
+                    Free_Variant(next->var_Data);
+                    next->var_Data = NULL;
+                }
+                next->Loc.Privious = NULL;
+                next->Loc.Next = NULL;
+                next->Loc.Mid = NULL;
+                next->Loc.start = NULL;
+                next->Loc.end = NULL;
+                free(next);
+            }
+            break;
+        }
+
+        default:
+            // If ITRLOC is not recognized, just free Temp's var_Data
+            if (Temp->var_Data) {
+                Free_Variant(Temp->var_Data);
+                Temp->var_Data = NULL;
+            }
+            break;
+    }
+}
