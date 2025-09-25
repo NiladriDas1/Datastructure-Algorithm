@@ -5,9 +5,17 @@
 *  All Funciton of Prototype Basically algorithm Of Array 
 *
 */
+
+
+
+
+
+
+
+
 ARR *Create_array(unsigned int T, ARR *ptr);
 enum ArrayisNull ARRAYISNULL(ARR *Ptr);
-
+void ArrayInfo(ARR *ptr);
 
 void FreearrayandLoc(ARR *ptr, unsigned int Len);
 void OnlyFreeArrayVardata(ARR *ptr, unsigned int Len);
@@ -47,6 +55,17 @@ void ARR_PushBack(ARR *arr, unsigned int *Len, VTD *data, unsigned int Max);
 int Variant_Compare_Multi(const VTD *a, const VTD *b);
 float ARR_Average(ARR *arr, unsigned int Len);
 void ARR_Deduplicate(ARR *arr, unsigned int Len);
+
+
+/*Complete these Loc code*/
+void ItrateThroughLoc(ARR *LOCARR);
+void DeleteThroughLoc(ARR *LOCARR);
+void UpdateThroughLoc(ARR *LOCARR);
+void ReplaceThroughLoc(ARR *LOCARR);
+void InfoThroughLoc(ARR *LOCARR);
+void SwapThroughLoc(ARR *LOCARR,ARR *LOCARR2);
+void SetNewLocThroughLoc(ARR *LOCARR);
+void FreethorughLoc(ARR *loc);
 
 
 
@@ -90,7 +109,7 @@ ARR *Create_array(unsigned int T, ARR *ptr) {
     return ptr;
 }
 
-enum ArrayisNull{NotEmpty,Empty};
+
 
 enum ArrayisNull ARRAYISNULL(ARR *Ptr){
     
@@ -156,6 +175,8 @@ void SwapIndicesAndUpdateLoc(ARR *ptr, unsigned int Len, unsigned int i, unsigne
         ptr[k].pos          = k;
     }
 }
+
+
 void Swap_EndToMid(ARR *ptr, unsigned int Len) {
     if (ARRAYISNULL(ptr))
     {
@@ -468,6 +489,23 @@ void ARR_Deduplicate(ARR *arr, unsigned int Len) {
                 arr[j].var_Data->value.i[0] = 0; // Mark duplicate
         }
     }
+}
+
+void ArrayInfo(ARR *ptr) {
+    if (ARRAYISNULL(ptr) || !ptr) return;
+
+    // Print addresses of all pointer fields in loc struct
+    printf("Loc.end:      %p\n", (void*)ptr->Loc.end);
+    printf("Loc.Mid:      %p\n", (void*)ptr->Loc.Mid);
+    printf("Loc.Next:     %p\n", (void*)ptr->Loc.Next);
+    printf("Loc.Privious: %p\n", (void*)ptr->Loc.Privious);
+    printf("Loc.start:    %p\n", (void*)ptr->Loc.start);
+
+    // Print other fields of ARR struct
+    printf("var_Data:     %p\n", (void*)ptr->var_Data);
+    printf("Counter:      %u\n", ptr->Counter);
+    printf("Max:          %d\n", ptr->Max);
+    printf("pos:          %u\n", ptr->pos);
 }
 
 
