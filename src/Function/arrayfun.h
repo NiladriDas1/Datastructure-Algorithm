@@ -62,11 +62,8 @@ void ARR_Deduplicate(ARR *arr, unsigned int Len);
 static ARR* get_loc_node(ARR *base, ITRLOC loc);
 void ItrateThroughLoc(ARR *LOCARR,ITRLOC ITloc);
 void DeleteThroughLoc(ARR *LOCARR,ITRLOC ITloc);
-void UpdateThroughLoc(ARR *LOCARR,ITRLOC ITloc);
-void ReplaceThroughLoc(ARR *LOCARR,ITRLOC ITloc);
+void UpdateThroughLoc(ARR *LOCARR,ITRLOC ITloc,ITRLOC ITloc2);
 void InfoThroughLoc(ARR *LOCARR,ITRLOC ITloc);
-void SwapThroughLoc(ARR *LOCARR,ARR *LOCARR2,ITRLOC ITloc1,ITRLOC ITloc2);
-void SetNewLocThroughLoc(ARR *LOCARR,ITRLOC ITloc);
 void FreethorughLoc(ARR *loc,ITRLOC ITloc);
 
 
@@ -697,4 +694,100 @@ void DeleteThroughLoc(ARR *LOCARR, ITRLOC ITloc) {
             }
             break;
     }
+}
+
+
+
+
+
+void FreethorughLoc(ARR *loc,ITRLOC ITloc){
+    if(!ITloc||!loc||ARRAYISNULL(loc))return;
+    switch (ITloc)
+    {
+        case MID:
+            Free_Variant(loc->Loc.Mid->var_Data);
+            loc->Loc.Mid->var_Data=NULL;
+            loc->Loc.Mid=NULL;
+            break;
+        case NEXT:
+            Free_Variant(loc->Loc.Next->var_Data);
+            loc->Loc.Next->var_Data=NULL;
+            loc->Loc.Next=NULL;
+            break;
+        case PRIVIOUS:
+            Free_Variant(loc->Loc.Privious->var_Data);
+            loc->Loc.Privious->var_Data=NULL;
+            loc->Loc.Privious=NULL;
+            break;
+        case START:
+        Free_Variant(loc->Loc.start->var_Data);
+            loc->Loc.start->var_Data=NULL;
+            loc->Loc.start=NULL;   
+        case END:
+        Free_Variant(loc->Loc.end->var_Data);
+            loc->Loc.end->var_Data=NULL;
+            loc->Loc.end=NULL;
+        default:
+            return;
+            break;
+    }
+
+}
+
+void UpdateThroughLoc(ARR *LOCARR, ITRLOC ITloc, ITRLOC ITloc2) {
+    struct Array **loc1 = NULL, **loc2 = NULL;
+
+    // Assign pointers based on enum location
+    switch (ITloc) {
+        case MID:      loc1 = &(LOCARR->Loc.Mid); break;
+        case END:      loc1 = &(LOCARR->Loc.end); break;
+        case START:    loc1 = &(LOCARR->Loc.start); break;
+        case PRIVIOUS: loc1 = &(LOCARR->Loc.Privious); break;
+        case NEXT:     loc1 = &(LOCARR->Loc.Next); break;
+    }
+    switch (ITloc2) {
+        case MID:      loc2 = &(LOCARR->Loc.Mid); break;
+        case END:      loc2 = &(LOCARR->Loc.end); break;
+        case START:    loc2 = &(LOCARR->Loc.start); break;
+        case PRIVIOUS: loc2 = &(LOCARR->Loc.Privious); break;
+        case NEXT:     loc2 = &(LOCARR->Loc.Next); break;
+    }
+    if (loc1 && loc2) {
+        struct Array *tmp = *loc1;
+        *loc1 = *loc2;
+        *loc2 = tmp;
+    }
+}
+
+
+
+
+
+void InfoThroughLoc(ARR *LOCARR, ITRLOC ITloc) {
+    struct Array *ptr = NULL;
+    const char *loc_name = "";
+
+    switch (ITloc) {
+        case MID:      ptr = LOCARR->Loc.Mid; loc_name = "MID"; break;
+        case END:      ptr = LOCARR->Loc.end; loc_name = "END"; break;
+        case START:    ptr = LOCARR->Loc.start; loc_name = "START"; break;
+        case PRIVIOUS: ptr = LOCARR->Loc.Privious; loc_name = "PRIVIOUS"; break;
+        case NEXT:     ptr = LOCARR->Loc.Next; loc_name = "NEXT"; break;
+    }
+
+    printf("[LOCARR %p] Loc.%s = %p\n", (void *)LOCARR, loc_name, (void *)ptr);
+    if (ptr) {
+        // Show details of the referenced ARR node
+        printf(
+            "  At %s: VTD* = %p, pos = %u, Counter = %u, Max = %d\n",
+            loc_name, (void *)ptr->var_Data, ptr->pos, ptr->Counter, ptr->Max
+        );
+    } else {
+        printf("  [NULL node at %s]\n", loc_name);
+    }
+    // Optionally, print info about current node
+    printf(
+        "Current: VTD* = %p, pos = %u, Counter = %u, Max = %d\n",
+        (void *)LOCARR->var_Data, LOCARR->pos, LOCARR->Counter, LOCARR->Max
+    );
 }
