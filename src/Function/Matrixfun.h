@@ -3,6 +3,21 @@
 
 
 
+typedef struct A3D{
+    ARR *data;
+    unsigned int depth, rows, cols;
+    struct A3D *Depth, *Rows, *Cols;
+} ARR_TENSOR;
+
+typedef struct A2D{
+    ARR *data;
+    unsigned int  rows, cols;
+    struct A2D *Rows, *Cols;
+} ARR_MATRIX;
+
+typedef struct Type_Oftensor{const unsigned int Low,High,Right,Left;}Typetensor;
+typedef enum ComputerOperation{XOR,AND,NOR,OR,NOT,NAND}CsOpcode;
+
 
 ARR_TENSOR *CreateTensor(ARR_TENSOR *PTR,Typetensor Size);
 void DestroyTensor(ARR_TENSOR *PTR);
