@@ -3,12 +3,14 @@
     #ifndef DYNAMIC_H
         #include"Memory\dynamic.h"
     #endif    
+    #include "Opcode.h"
 
-typedef enum ValidType{TREE}Vtype;
+  
+
 typedef struct Tree
 { 
 
-    ValidType T;
+    Vtype T;
     
    struct validD{
         unsigned int key;

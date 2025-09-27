@@ -4,7 +4,7 @@
     #ifndef DYNAMIC_H
         #include"Memory\dynamic.h"
     #endif
-typedef enum Type{Singly,Doubly,circular,double_cricular,N_Direction_List}TP;
+#include "Opcode.h"
 typedef struct Linked_list{
     TP T;
     void *Casting;

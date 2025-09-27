@@ -47,8 +47,3 @@ ARR_TENSOR *CreateSparse0and1Tensor(ARR_TENSOR *TENS,Typetensor Size);
 
 
 
-
-ARR_TENSOR *CreateTensor(ARR_TENSOR *PTR,Typetensor Size){
-
-
-}
