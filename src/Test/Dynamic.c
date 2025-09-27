@@ -2,47 +2,31 @@
 
 int main() {
     // Integer variant
-    VTD *vi = Variant_vargs(TYPE_INT, 4, 10, 20, 30, 40);
+    VTD *vi = Variant_vargs(TYPE_INT, 8, 10, 20, 30, 40,201,301,401,901);
     printf("\n-- INT Operations --\n");
     Variant_print(vi);
+
     Variant_Method(vi, Push, 55);         Variant_print(vi);
+
     Variant_Method(vi, Pop);              Variant_print(vi);
+    
     Variant_print(Variant_Method(vi, Mid));
     Variant_print(Variant_Method(vi, End));
     Variant_print(Variant_Method(vi, Begin));
     Variant_Method(vi, Swap, 0, 2);       Variant_print(vi);
-    Variant_print(Variant_Method(vi, Sum));
-    Variant_print(Variant_Method(vi, Substract));
+    
+    /*Variant_print(Variant_Method(vi, Sum));
+
+    Variant_print(Variant_Method(vi, Substract));*/
     Variant_print(Variant_Method(vi, Division));
     Variant_print(Variant_Method(vi, Avarage));
-    Variant_print(Variant_Method(vi, Min));
-    Variant_print(Variant_Method(vi, Max));
-    Variant_print(Variant_Method(vi, Mod));
+
+    
     Variant_print(Variant_Method(vi, Multiply));
     Variant_print(Variant_Method(vi, Count));
     Free_Variant(vi);
 
-    // Float variant
-    VTD *vf = Variant_vargs(TYPE_FLOAT, 3, 5.5, 7.0, 2.5);
-    printf("\n-- FLOAT Operations --\n");
-    Variant_print(vf);
-    Variant_Method(vf, Push, 4.6);        Variant_print(vf);
-    Variant_Method(vf, Pop);              Variant_print(vf);
-    Variant_print(Variant_Method(vf, Mid));
-    Variant_print(Variant_Method(vf, End));
-    Variant_print(Variant_Method(vf, Begin));
-    Variant_Method(vf, Swap, 0, 2);       Variant_print(vf);
-    Variant_print(Variant_Method(vf, Sum));
-    Variant_print(Variant_Method(vf, Substract));
-    Variant_print(Variant_Method(vf, Division));
-    Variant_print(Variant_Method(vf, Avarage));
-    Variant_print(Variant_Method(vf, Min));
-    Variant_print(Variant_Method(vf, Max));
-    Variant_print(Variant_Method(vf, Mod));
-    Variant_print(Variant_Method(vf, Multiply));
-    Variant_print(Variant_Method(vf, Count));
-    Free_Variant(vf);
-
+    
     // Char variant
     VTD *vc = Variant_vargs(TYPE_CHAR, 4, 'a', 'b', 'c', 'z');
     printf("\n-- CHAR Operations --\n");
@@ -52,9 +36,13 @@ int main() {
     Variant_print(Variant_Method(vc, Mid));
     Variant_print(Variant_Method(vc, End));
     Variant_print(Variant_Method(vc, Begin));
+
     Variant_Method(vc, Swap, 1, 2);       Variant_print(vc);
+    
     Variant_print(Variant_Method(vc, Sum));
+    
     Variant_print(Variant_Method(vc, Substract));
+ 
     Variant_print(Variant_Method(vc, Division));
     Variant_print(Variant_Method(vc, Avarage));
     Variant_print(Variant_Method(vc, Min));

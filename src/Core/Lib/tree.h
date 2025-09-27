@@ -8,7 +8,7 @@ typedef enum ValidType{TREE}Vtype;
 typedef struct Tree
 { 
 
-    ValidType T;
+    //ValidType T;
     
    struct validD{
         unsigned int key;

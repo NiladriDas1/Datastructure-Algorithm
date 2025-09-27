@@ -1,41 +1,47 @@
-#ifndef DYNAMIC_H
-#define DYNAMIC_H
+#include "VTD.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
-#include <math.h>
-#define MAX_VARGS 10
-
-typedef enum { TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING } TYPE;
-typedef enum Method{Push,Pop,Mid,End,Begin,Swap,Sum,Substract,Division,Avarage,Min,Max,Mod,Multiply,Count}METH;
-typedef union {
-    int *i;
-    float *f;
-    char *c;
-    char **s;
-    void *ptr;
-} Data;
-
-typedef struct Variant {
-    TYPE type;
-    size_t length;
-    Data value;
-} VTD;
 
 void Free_Variant(VTD *ptr);
+
 int Variant_Compare(const VTD *a, const VTD *b);
+
 static void free_string_array(char **arr, size_t len);
+
 VTD *Variant_vargs(TYPE T, size_t count, ...);
-void Variant_print(const VTD *v);
-int Variant_search(const VTD *v, const void *value); 
-int Variant_update(VTD *v, const void *oldv, const void *newv);
-int Variant_delete(VTD *v, const void *value) ;
-int Variant_resize(VTD *v, size_t new_len);
-void Variant_throw(const char *msg);
-VTD *Variant_Method(VTD *V, METH M, ...);
 int VTDisNull(VTD *ptr);
+
+void Variant_print(const VTD *v);
+
+int Variant_search(const VTD *v, const void *value); 
+
+int Variant_update(VTD *v, const void *oldv, const void *newv);
+
+int Variant_delete(VTD *v, const void *value) ;
+
+int Variant_resize(VTD *v, size_t new_len);
+
+void Variant_throw(const char *msg);
+
+VTD *Variant_Method(VTD *V, METH M, ...);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Free_Variant(VTD *ptr) {
     if (!ptr) return;
@@ -222,133 +228,6 @@ void Variant_throw(const char *msg) {
     exit(EXIT_FAILURE);
 }
 
-/*VTD *Variant_Method(VTD *V, METH M, ...) {
-    if (!V) return NULL;
-
-    va_list ap;
-    va_start(ap, M);
-
-    switch (M) {
-        case Push: {
-            // Push: Add new element to end
-            if (V->length >= MAX_VARGS) {
-                va_end(ap);
-                return V;
-            }
-            // Allocate new variant with +1 length
-            size_t new_len = V->length + 1;
-            Variant_resize(V, new_len);
-            // Add new value at last index
-            switch (V->type) {
-                case TYPE_INT:   V->value.i[new_len-1] = va_arg(ap, int);          break;
-                case TYPE_FLOAT: V->value.f[new_len-1] = (float)va_arg(ap, double);break;
-                case TYPE_CHAR:  V->value.c[new_len-1] = (char)va_arg(ap, int);    break;
-                case TYPE_STRING:
-                    V->value.s[new_len-1] = strdup(va_arg(ap, char *));
-                    break;
-            }
-            break;
-        }
-        case Pop: {
-            // Pop: Remove last element
-            if (V->length == 0) break;
-            if (V->type == TYPE_STRING && V->value.s[V->length-1])
-                free(V->value.s[V->length-1]);
-            Variant_resize(V, V->length-1);
-            break;
-        }
-        case Mid: {
-            // Return new Variant containing only mid element
-            if (V->length == 0) break;
-            size_t mid = V->length / 2;
-            VTD *mid_variant = NULL;
-            switch (V->type) {
-                case TYPE_INT:
-                    mid_variant = Variant_vargs(TYPE_INT, 1, V->value.i[mid]);
-                    break;
-                case TYPE_FLOAT:
-                    mid_variant = Variant_vargs(TYPE_FLOAT, 1, V->value.f[mid]);
-                    break;
-                case TYPE_CHAR:
-                    mid_variant = Variant_vargs(TYPE_CHAR, 1, V->value.c[mid]);
-                    break;
-                case TYPE_STRING:
-                    mid_variant = Variant_vargs(TYPE_STRING, 1, V->value.s[mid]);
-                    break;
-            }
-            va_end(ap);
-            return mid_variant;
-        }
-        case End: {
-            // Return new Variant containing last element
-            if (V->length == 0) break;
-            size_t idx = V->length - 1;
-            VTD *end_variant = NULL;
-            switch (V->type) {
-                case TYPE_INT:    end_variant = Variant_vargs(TYPE_INT, 1, V->value.i[idx]);        break;
-                case TYPE_FLOAT:  end_variant = Variant_vargs(TYPE_FLOAT, 1, V->value.f[idx]);      break;
-                case TYPE_CHAR:   end_variant = Variant_vargs(TYPE_CHAR, 1, V->value.c[idx]);       break;
-                case TYPE_STRING: end_variant = Variant_vargs(TYPE_STRING, 1, V->value.s[idx]);     break;
-            }
-            va_end(ap);
-            return end_variant;
-        }
-        case Begin: {
-            // Return new Variant containing first element
-            if (V->length == 0) break;
-            VTD *begin_variant = NULL;
-            switch (V->type) {
-                case TYPE_INT:    begin_variant = Variant_vargs(TYPE_INT, 1, V->value.i[0]);        break;
-                case TYPE_FLOAT:  begin_variant = Variant_vargs(TYPE_FLOAT, 1, V->value.f[0]);      break;
-                case TYPE_CHAR:   begin_variant = Variant_vargs(TYPE_CHAR, 1, V->value.c[0]);       break;
-                case TYPE_STRING: begin_variant = Variant_vargs(TYPE_STRING, 1, V->value.s[0]);     break;
-            }
-            va_end(ap);
-            return begin_variant;
-        }
-        case Swap: {
-            // Swap two elements: Provide two indices
-            int idx1 = va_arg(ap, int);
-            int idx2 = va_arg(ap, int);
-            if (idx1 < 0 || idx2 < 0 || idx1 >= V->length || idx2 >= V->length) break;
-            switch (V->type) {
-                case TYPE_INT: {
-                    int tmp = V->value.i[idx1];
-                    V->value.i[idx1] = V->value.i[idx2];
-                    V->value.i[idx2] = tmp;
-                    break;
-                }
-                case TYPE_FLOAT: {
-                    float tmp = V->value.f[idx1];
-                    V->value.f[idx1] = V->value.f[idx2];
-                    V->value.f[idx2] = tmp;
-                    break;
-                }
-                case TYPE_CHAR: {
-                    char tmp = V->value.c[idx1];
-                    V->value.c[idx1] = V->value.c[idx2];
-                    V->value.c[idx2] = tmp;
-                    break;
-                }
-                case TYPE_STRING: {
-                    char *tmp = V->value.s[idx1];
-                    V->value.s[idx1] = V->value.s[idx2];
-                    V->value.s[idx2] = tmp;
-                    break;
-                }
-            }
-            break;
-        }
-        // Add more methods if needed
-    }
-    va_end(ap);
-    return V;
-}*/
-
-
-
-
-
 VTD *Variant_Method(VTD *V, METH M, ...) {
     if (!V) return NULL;
 
@@ -467,7 +346,7 @@ VTD *Variant_Method(VTD *V, METH M, ...) {
             break;
         }
                     // Add more methods if needed
-                    case Sum: {
+            case Sum: {
                 int total_i = 0;
                 float total_f = 0;
                 switch (V->type) {
@@ -660,4 +539,4 @@ int Variant_Compare(const VTD *a, const VTD *b) {
     }
 }
 
-#endif
+
